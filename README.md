@@ -9,6 +9,7 @@ For example, file helloworlds.txt:
     Hello world world world world world world world world world world world world world world world world world world world world 
 
 (no final end of line), encoded with the following command:
+
     $ python babushkin_arch.py samples/helloworlds.txt samples/helloworlds.txt.enc
 
 will produce file "helloworlds.txt.enc" having size 30 bytes, whereas original file is 126 bytes.
@@ -20,11 +21,13 @@ Algorithm
 ---------
 Encoding ("compression") algorithm has the following steps:
 
-1) Data file is represented as one long binary number X; 0 <= X < 1
-2) A pair of minimal natural numbers P,Q is searched, such that:
+# Data file is represented as one long binary number X; 0 <= X < 1
+
+# A pair of minimal natural numbers P,Q is searched, such that:
    X ≈ P/Q
    with precision, enough to restore original number X with all digits.
-3) Size of the original file and numbers P, Q are written to the compressed file.
+
+# Size of the original file and numbers P, Q are written to the compressed file.
 
 Implementation
 --------------
@@ -39,9 +42,11 @@ Running
 -------
 
 To compress file "input", use command:
+
     $ python babushking_encode.py input output
 
 To decompress, use:
+
     $ python babushking_encode.py -d input output
 
 Installation

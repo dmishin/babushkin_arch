@@ -21,13 +21,11 @@ Algorithm
 ---------
 Encoding ("compression") algorithm has the following steps:
 
-# Data file is represented as one long binary number X; 0 <= X < 1
-
-# A pair of minimal natural numbers P,Q is searched, such that:
-   X ≈ P/Q
-   with precision, enough to restore original number X with all digits.
-
-# Size of the original file and numbers P, Q are written to the compressed file.
+1.  Data file is represented as one long binary number X; 0 <= X < 1
+2.  A pair of minimal natural numbers P,Q is searched, such that:
+    X ≈ P/Q
+    with precision, enough to restore original number X with all digits.
+3.  Size of the original file and numbers P, Q are written to the compressed file.
 
 Implementation
 --------------

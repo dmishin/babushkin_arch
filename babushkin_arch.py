@@ -108,6 +108,20 @@ def encode_file( ifile, ofile ):
     ofile.write( num )
     ofile.write( den )
 
+def parse_encoded_file(ifile):
+    """Parse format, produced by the encoder, returning 3-tuple: 
+    (n, numerator, denominator)
+    """
+    n, num, den = parse_encoded_file( ifile )
+    n, m = struct.unpack("ii", ifile.read(8))
+    num = ifile.read(m)
+    den = ifile.read()
+    if len(num) != m: 
+        raise ValueError, "Unexpected end of file: numerator incomplete"
+    if len(den) < len(num): 
+        raise ValueError, "Unexpected end of file: denominator shorter than numerator"
+    return n, long_from_bytes(num), long_from_bytes(den)
+
 def decode_file( ifile, ofile ):
     """Decode a file of the following format:
     bytes 0-3: number bytes to decode
@@ -116,14 +130,18 @@ def decode_file( ifile, ofile ):
     <denominator bytes>
     EOF
     """
-    n, m = struct.unpack("ii", ifile.read(8))
-    num = ifile.read(m)
-    den = ifile.read()
-    if len(num) != m: 
-        raise ValueError, "Unexpected end of file: numerator incomplete"
-    if len(den) < len(num): 
-        raise ValueError, "Unexpected end of file: denominator shorter than numerator"
-    rational_to_file( n, long_from_bytes(num), long_from_bytes(den), ofile )
+    n, num, den = parse_encoded_file( ifile )
+    rational_to_file( n, num, den, ofile )
+
+def dump_continuous_fraction(hifile, hofile):
+    """Read a binary fraction from the input file, and put its 
+    continuous fraction coefficients to the output file, one number per line
+    """
+    s = hifile.read()
+    num = long_from_bytes(s)
+    den = 1<<(8*len(s))
+    for k in nearest_chain( num, den ):
+        hofile.write("%d\n"%k)
 
 if __name__=="__main__":
     import sys
@@ -135,10 +153,26 @@ if __name__=="__main__":
                       help="Set encode mode (default)")
     parser.add_option("-d", "--decode", dest="encode", action="store_false", 
                       help="Set decode mode")
+
+    parser.add_option("-c", "--cfrac", dest="cfrac_file", metavar="FILE",
+                      default = None,
+                      help="Dump continuous fraction coefficient to the FILE (one number per line)")
     (options, args) = parser.parse_args()
+    if options.cfrac_file:
+        if not options.encode:
+            parser.error("Dumping continuous fraction is only possible, when encoding data")
+        if len(args) != 1:
+            parser.error("No output is generated, when dumping continuous fraction coefficients")
+        ifile = args[0]
+        with open(ifile, "rb") as hifile:
+            with open(options.cfrac_file, "w") as hdumpfile:
+                print "Dumping CF expansion of %s to %s"%(ifile, options.cfrac_file)
+                dump_continuous_fraction(hifile, hdumpfile)
+                exit(0)
+        
+
     if len(args) != 2:
         parser.error("Must have 2 arguments: input and output")
-
     ifile, ofile = args
     with open(ifile, "rb") as hifile:
         with open(ofile, "wb") as hofile:

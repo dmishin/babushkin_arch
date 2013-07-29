@@ -33,9 +33,7 @@ def encode_file( ifile, ofile ):
     ofile.write("0.")
     for digit in decimal_digits(num, den):
         ofile.write(str(digit))
-    
 
-USAGE = """"""
 if __name__=="__main__":
     from optparse import OptionParser
     import sys

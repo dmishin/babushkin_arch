@@ -35,18 +35,17 @@ def encode_file( ifile, ofile ):
         ofile.write(str(digit))
     
 
-USAGE = """python %s INPUT_FILE [OUTPUT_FILE]"""
+USAGE = """"""
 if __name__=="__main__":
+    from optparse import OptionParser
     import sys
-    script = sys.argv[0]
-    args = sys.argv[1:]
+    parser = OptionParser(usage = "python %prog INPUT_FILE [OUTPUT_FILE]\npython %prog --help")
+    (options, args) = parser.parse_args()
     argc = len(args)
     if argc < 1:
-        print(USAGE % script)
-        exit(0)
+        parser.error("Input file not specified.")
     if argc > 2:
-        print "Too many command line arguments"
-        exit(1)
+        parser.error("Too many arguments.")
 
     ifile = args[0]
     ofile = args[1] if argc >= 2 else None

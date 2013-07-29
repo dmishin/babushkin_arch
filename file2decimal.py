@@ -1,5 +1,12 @@
 from __future__ import with_statement
 
+def gcd(a,b):
+    "Greatest common divisor"
+    while True:                
+        if b==0: return a
+        if a%b==0: return b
+        a,b = b,a%b
+
 def long_from_bytes(s):
     """Convert string to base-256 integer, first byte is highest"""
     num = 0
@@ -8,10 +15,13 @@ def long_from_bytes(s):
         num |= ord(c)
     return num
 
-def decimal_digits( num, den ):
+def decimal_digits( num, den, base=10 ):
     """Returns decimal digits of a rational number in range [0; 1) """
     while num > 0:
-        num *= 10
+        den_divisor = gcd( den, base )
+        num_multiplier = base / den_divisor
+        num *= num_multiplier
+        den /= den_divisor
         yield num / den
         num = num % den
     

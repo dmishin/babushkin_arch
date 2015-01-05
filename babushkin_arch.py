@@ -56,12 +56,17 @@ def decode_hex_string( st, n ):
         s.write("%x"%d)
     return s.getvalue()
 
-def long_to_bytes( n ):
-    """Convert long value to string"""
+def long_to_bytes( n, nbytes=None ):
+    """Convert long value to string of bytes, either minimal or of given length """
     odata = sio()
+    written = 0
     while n > 0:
         odata.write(chr(n & 0xff))
+        written += 1
         n >>= 8
+    if nbytes is not None:
+        for i in xrange(nbytes-written):
+            odata.write('\x00')
     return odata.getvalue()[::-1]
 
 def long_from_bytes(s):
@@ -92,7 +97,7 @@ def rational_to_file( n, num, den, ostream ):
         num <<= (8*nbytes)
         d = num / den
         num = num % den
-        ostream.write( long_to_bytes(d) )
+        ostream.write( long_to_bytes(d, nbytes) )
         n -= nbytes
 
 def rational_to_string( n, num, den ):
@@ -104,7 +109,7 @@ def rational_to_string( n, num, den ):
 def encode_file( ifile, ofile ):
     """Encode a file"""
     n, num, den = encode_bytes( ifile.read() )
-    ofile.write( struct.pack("ii", n, len(num)))
+    ofile.write( struct.pack("<ii", n, len(num)))
     ofile.write( num )
     ofile.write( den )
 
@@ -112,8 +117,7 @@ def parse_encoded_file(ifile):
     """Parse format, produced by the encoder, returning 3-tuple: 
     (n, numerator, denominator)
     """
-    n, num, den = parse_encoded_file( ifile )
-    n, m = struct.unpack("ii", ifile.read(8))
+    n, m = struct.unpack("<ii", ifile.read(8))
     num = ifile.read(m)
     den = ifile.read()
     if len(num) != m: 

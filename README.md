@@ -44,11 +44,11 @@ Running
 
 To compress file "input", use command:
 
-    $ python babushking_encode.py input output
+    $ python babushkin_arch.py input output
 
 To decompress, use:
 
-    $ python babushking_encode.py -d input output
+    $ python babushkin_arch.py -d input output
 
 Data Format
 -----------
